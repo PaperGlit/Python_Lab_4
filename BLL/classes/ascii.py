@@ -1,23 +1,23 @@
 import os
 import random
 import string
-import GlobalVariables as Global
 
 
 class Ascii:
-    def __init__(self, text, width = Global.width, height = Global.height, color = Global.color):
+    def __init__(self, text, width = 0, height = 0, color = "\033[39m"):
         self.text = text
         self.font = self.__load_font()
-        self.width = width
+        self.width = self.verify_width(width)
         self.height = height
         if color == "random":
             self.color = "\033[" + str(random.randint(31, 39)) + "m"
         else:
             self.color = color
+        self.color_reset = "\033[0m"
 
     def print(self):
         art = self.format_art()
-        print(self.color + art + Global.color_reset)
+        print(self.color + art +  self.color_reset)
         return art
 
     def wrap_art(self):
