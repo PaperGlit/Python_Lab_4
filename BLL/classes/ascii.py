@@ -80,7 +80,7 @@ class Ascii:
     def __load_font():
         keys = (list(string.ascii_uppercase) + list(string.digits) +
                 ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=",
-                 "+", "[", "]", ";", ":", "'", '"', ",", ".", "/", "<", ">", "?"])
+                 "+", "[", "]", ";", ":", "'", '"', ",", ".", "/", "<", ">", "?", " "])
         font = {}
         with open("Sources/font.txt", "r") as file:
             i = 0
