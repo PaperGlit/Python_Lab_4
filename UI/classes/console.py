@@ -15,6 +15,7 @@ class Console:
                            "2 - Change font's symbols\n"
                            "3 - Change width and height\n"
                            "4 - Change color\n"
+                           "5 - Change text orientation\n"
                            "Your choice: ")
             match prompt:
                 case "1":
@@ -25,6 +26,8 @@ class Console:
                     self.__change_width_and_height()
                 case "4":
                     self.__change_color()
+                case "5":
+                    self.__justify()
                 case _:
                     return
 
@@ -120,3 +123,21 @@ class Console:
                 print("Invalid color choice, please try again.")
                 return
         print("Color changed successfully")
+
+    def __justify(self):
+        justify_prompt = input("Enter the orientation of your ASCII art:\n"
+                               "1 - Left\n"
+                               "2 - Center\n"
+                               "3 - Right\n"
+                               "Your choice: ")
+        match justify_prompt:
+            case "1":
+                self.ascii.justify = "left"
+            case "2":
+                self.ascii.justify = "center"
+            case "3":
+                self.ascii.justify = "right"
+            case "_":
+                print("Invalid orientation choice, please try again.")
+                return
+        print("Orientation changed successfully")

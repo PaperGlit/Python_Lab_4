@@ -53,7 +53,22 @@ class Ascii:
                 formatted_font_art = font_art.replace('*', self.highlight).replace('#', self.text_s).replace('&', self.shadow)
                 split_font_art = formatted_font_art.splitlines()
                 unsorted_art_list.append(split_font_art)
-            art_list = ["".join(row) for row in zip(*unsorted_art_list)]
+            #before:
+            #art_list = ["".join(row) for row in zip(*unsorted_art_list)]
+            art_list = []
+            for row in zip(*unsorted_art_list):
+                row_str = "".join(row)
+                match self.justify:
+                    case "left":
+                        art_list.append(row_str)
+                    case "center":
+                        width = self.width - len(row_str)
+                        padding = " " * (width // 2)
+                        art_list.append(padding + row_str + padding)
+                    case "right":
+                        width = self.width - len(row_str)
+                        padding = " " * width
+                        art_list.append(padding + row_str)
             art_lines.append("\n".join(art_list))
         art = "\n\n".join(art_lines)
         art_height = len(art.splitlines())
