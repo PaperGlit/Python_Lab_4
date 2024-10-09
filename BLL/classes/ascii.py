@@ -27,7 +27,9 @@ class Ascii:
         length = 0
         current_line = ""
         for char in self.text.upper():
-            if char in ["M", "W", "4"]:
+            if char in ["@", "#"]:
+                length += 9
+            if char in ["M", "W", "4", "*"]:
                 length += 8
             elif char in self.font:
                 length += 7
@@ -53,8 +55,6 @@ class Ascii:
                 formatted_font_art = font_art.replace('*', self.highlight).replace('#', self.text_s).replace('&', self.shadow)
                 split_font_art = formatted_font_art.splitlines()
                 unsorted_art_list.append(split_font_art)
-            #before:
-            #art_list = ["".join(row) for row in zip(*unsorted_art_list)]
             art_list = []
             for row in zip(*unsorted_art_list):
                 row_str = "".join(row)
@@ -78,7 +78,9 @@ class Ascii:
 
     @staticmethod
     def __load_font():
-        keys = list(string.ascii_uppercase) + list(string.digits) + [".", ",", ";", "'", '"', "!", "?", " "]
+        keys = (list(string.ascii_uppercase) + list(string.digits) +
+                ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=",
+                 "+", "[", "]", ";", ":", "'", '"', ",", ".", "/", "<", ">", "?"])
         font = {}
         with open("Sources/font.txt", "r") as file:
             i = 0
