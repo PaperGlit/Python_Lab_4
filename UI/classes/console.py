@@ -9,6 +9,7 @@ class Console:
 
     def __prompt(self):
         self.ascii.print()
+        self.ascii.color = "\033[39m"
         while True:
             prompt = input("1 - Enter text\n"
                            "2 - Change font's symbols\n"
@@ -33,19 +34,10 @@ class Console:
         ftext = self.ascii.print()
         save_prompt = input("Do you want to save the text? (y/n): ").lower()
         if save_prompt == "y":
-            while True:
-                file_name = input("Enter file name: ")
-                if file_name.strip() != "":
-                    if not file_name.endswith(".txt"):
-                        file_name += ".txt"
-                    try:
-                        file_upload.write(ftext, file_name)
-                        print("The art was uploaded successfully")
-                        break
-                    except IOError:
-                        print("An error occurred during file upload, please try again")
-                else:
-                    print("Please enter a valid file name")
+            try:
+                file_upload.write(ftext)
+            except IOError:
+                print("The file could not be uploaded, please try again")
 
     def __change_symbols(self):
         while True:
