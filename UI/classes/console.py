@@ -1,43 +1,36 @@
-import random
-import textwrap
 import GlobalVariables as Global
 from BLL.classes.ascii import Ascii
-from pyfiglet import FigletFont, figlet_format
 import DAL.functions.upload_to_file as file_upload
 
 
 class Console:
-    @staticmethod
-    def prompt():
-        Ascii.print("ASCIIFY", True)
+    def __init__(self):
+        self.__prompt()
+
+    def __prompt(self):
+        Ascii("ASCIIFY", color="random").print()
         while True:
             prompt = input("1 - Enter text\n"
-                           "2 - Select font automatically\n"
-                           "3 - Change font\n"
-                           "4 - Current font\n"
-                           "5 - Change width and height\n"
-                           "6 - Change color\n"
+                           "2 - Change font's symbols\n"
+                           "3 - Change width and height\n"
+                           "4 - Change color\n"
                            "Your choice: ")
             match prompt:
                 case "1":
-                    Console.enter_text()
+                    self.__enter_text()
                 case "2":
-                    Console.auto_font()
+                    self.__change_symbols()
                 case "3":
-                    Console.change_font()
+                    self.__change_width_and_height()
                 case "4":
-                    print("Current font: " + Global.font)
-                case "5":
-                    Console.change_width_and_height()
-                case "6":
-                    Console.change_color()
+                    self.__change_color()
                 case _:
                     return
 
     @staticmethod
-    def enter_text():
+    def __enter_text():
         text = input("Enter text: ")
-        ftext = Ascii.print(text)
+        ftext = Ascii(text).print()
         save_prompt = input("Do you want to save the text? (y/n): ").lower()
         if save_prompt == "y":
             while True:
@@ -55,42 +48,30 @@ class Console:
                     print("Please enter a valid file name")
 
     @staticmethod
-    def auto_font():
-        text = input("Enter text: ")
-        symbols = input("Enter a set of characters that should be in the ASCII art: ")
-        font_symbols = set(symbols) | {" ", "\n"}
-        fonts = FigletFont.getFonts()
-        random.shuffle(fonts)
-        for font in fonts:
-            random_art = figlet_format(text, font=font, width=Global.width)
-            random_art_chars = set(random_art)
-            if sorted(random_art_chars) ==  sorted([" ", "\n"]):
+    def __change_symbols():
+        while True:
+            shadow_prompt = input("Enter symbol for shadows: ")
+            if shadow_prompt.strip() != "" or len(shadow_prompt) == 1:
+                Global.shadow = shadow_prompt
+            else:
+                print("Please enter a valid shadow symbol (only one allowed)")
                 continue
-            elif sorted(random_art_chars) == sorted(font_symbols):
-                print("Found font:" + font)
-                Global.font = font
-                Ascii.print(text)
-                return
-        print("No fonts were found, please try again with a narrower set of characters")
+            text_prompt = input("Enter symbol for text: ")
+            if text_prompt.strip() != "" or len(text_prompt) == 1:
+                Global.text = text_prompt
+            else:
+                print("Please enter a valid text symbol (only one allowed)")
+                continue
+            highlight_prompt = input("Enter symbol for highlight: ")
+            if highlight_prompt.strip() != "" or len(highlight_prompt) == 1:
+                Global.highlight = highlight_prompt
+            else:
+                print("Please enter a valid highlight symbol (only one allowed)")
+                continue
+            break
 
     @staticmethod
-    def change_font():
-        new_font = input("Enter the new font you want to choose\n"
-                         "You can also use 'font' to see all fonts available or 'random' to choose a random font\n"
-                         "Your choice: ")
-        if new_font in FigletFont.getFonts():
-            Global.font = new_font
-            print("Font changed successfully")
-        elif new_font.lower() == "font":
-            print("Available fonts:\n" + textwrap.fill(", ".join(FigletFont.getFonts()), width=Global.width))
-        elif new_font.lower() == "random":
-            Global.font = random.choice(FigletFont.getFonts())
-            print("Randomly selected font: " + Global.font)
-        else:
-            print("Invalid font")
-
-    @staticmethod
-    def change_width_and_height():
+    def __change_width_and_height():
         while True:
             width_prompt = input("Enter the width of an ASCII art\n"
                       "(any non-positive value will reset it to default values\n"
@@ -115,7 +96,7 @@ class Console:
                 continue
 
     @staticmethod
-    def change_color():
+    def __change_color():
         color_prompt = input("Enter the color of your ASCII art:\n"
                              "1 - Red\n"
                              "2 - Green\n"

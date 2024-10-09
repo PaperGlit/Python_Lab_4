@@ -1,15 +1,60 @@
 import os
-import math
 import random
 import string
-
 import GlobalVariables as Global
-from pyfiglet import figlet_format, FigletFont
 
 
 class Ascii:
+    def __init__(self, text, width = Global.width, height = Global.height, color = Global.color):
+        self.text = text
+        self.font = self.__load_font()
+        self.width = width
+        self.height = height
+        if color == "random":
+            self.color = "\033[" + str(random.randint(31, 39)) + "m"
+        else:
+            self.color = color
+
+    def print(self):
+        art = self.format_art()
+        print(self.color + art + Global.color_reset)
+        return art
+
+    def wrap_art(self):
+        wrapped_text = []
+        length = 0
+        current_line = ""
+        for char in self.text:
+            if char in ["M", "W", "4"]:
+                length += 8
+            else:
+                length += 7
+            if length > self.width:
+                wrapped_text.append(current_line)
+                current_line = char
+                length = 8 if char in ["M", "W", "4"] else 7
+            else:
+                current_line += char
+        if current_line:
+            wrapped_text.append(current_line)
+        return wrapped_text
+
+    def format_art(self):
+        wrapped_art = self.wrap_art()
+        art_lines = []
+        for chunk in wrapped_art:
+            unsorted_art_list = [self.font[char.upper()].splitlines() for char in chunk]
+            art_list = ["".join(row) for row in zip(*unsorted_art_list)]
+            art_lines.append("\n".join(art_list))
+        art = "\n\n".join(art_lines)
+        art_height = len(art.splitlines())
+        height_diff = self.height - art_height
+        padding = "\n" * (height_diff // 2) if height_diff > 0 else ""
+        art = padding + art + padding
+        return art
+
     @staticmethod
-    def load_font():
+    def __load_font():
         keys = list(string.ascii_uppercase) + list(string.digits) + [".", ",", ";", "'", '"', "!", "?", " "]
         font = {}
         i = 0
@@ -25,7 +70,6 @@ class Ascii:
                         font[key] += line
         return font
 
-
     @staticmethod
     def verify_width(width):
         if width <= 0:
@@ -37,27 +81,3 @@ class Ascii:
             return width
         else:
             return 220
-
-    @staticmethod
-    def print(text, random_color = False):
-        font = Ascii.load_font()
-        unsorted_art_list = []
-        art_list = []
-        for char in text.upper():
-            unsorted_art_list.append(font[char].splitlines())
-        for col in range(len(unsorted_art_list[0])):
-            for row in unsorted_art_list:
-                art_list.append(row[col])
-            art_list.append("\n")
-        art = "".join(art_list)
-        if random_color:
-            color = "\033[" + str(random.randint(31, 39)) + "m"
-        else:
-            color = Global.color
-        art_height = len(art.splitlines())
-        if Global.height > art_height:
-            height = Global.height - art_height
-        else:
-            height = 0
-        print(color + "\n" * math.ceil(height / 2) + art + "\n" * math.floor(height / 2) + Global.color_reset)
-        return art
