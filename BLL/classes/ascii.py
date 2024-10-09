@@ -1,34 +1,41 @@
 import os
 import random
 import string
+from BLL.classes.incorrect_character_exception import IncorrectCharacterException
+from BLL.classes.incorrect_font_format_exception import IncorrectFontFormatException
 
 
 class Ascii:
-    def __init__(self, text, width = 0, height = 0, color = "\033[39m"):
+    def __init__(self, text, width = 0, height = 0, color = "\033[39m", shadow = "#", text_s ="#", highlight ="#"):
         self.text = text
-        self.font = self.__load_font()
-        self.width = self.verify_width(width)
+        self.shadow = shadow
+        self.text_s = text_s
+        self.highlight = highlight
         self.height = height
+        self.width = self.__verify_width(width)
         if color == "random":
             self.color = "\033[" + str(random.randint(31, 39)) + "m"
         else:
             self.color = color
         self.color_reset = "\033[0m"
+        self.font = self.__load_font()
 
     def print(self):
-        art = self.format_art()
+        art = self.__format_art()
         print(self.color + art +  self.color_reset)
         return art
 
-    def wrap_art(self):
+    def __wrap_art(self):
         wrapped_text = []
         length = 0
         current_line = ""
         for char in self.text:
             if char in ["M", "W", "4"]:
                 length += 8
-            else:
+            elif char in self.font:
                 length += 7
+            else:
+                raise IncorrectCharacterException("The character " + char + " is not a valid character.")
             if length > self.width:
                 wrapped_text.append(current_line)
                 current_line = char
@@ -39,11 +46,31 @@ class Ascii:
             wrapped_text.append(current_line)
         return wrapped_text
 
-    def format_art(self):
-        wrapped_art = self.wrap_art()
+    def __format_art(self):
+        wrapped_art = self.__wrap_art()
         art_lines = []
         for chunk in wrapped_art:
-            unsorted_art_list = [self.font[char.upper()].splitlines() for char in chunk]
+            unsorted_art_list = []
+            for art_char in chunk:
+                formatted_font_art = ""
+                font_art = self.font[art_char.upper()]
+                for char in font_art:
+                    match char:
+                        case "*":
+                            char = self.highlight
+                        case "#":
+                            char = self.text_s
+                        case "&":
+                            char = self.shadow
+                        case " ":
+                            pass
+                        case "\n":
+                            pass
+                        case _:
+                            raise IncorrectFontFormatException("The character " + char + " is not a valid character in a font.txt.")
+                    formatted_font_art += char
+                split_font_art = formatted_font_art.splitlines()
+                unsorted_art_list.append(split_font_art)
             art_list = ["".join(row) for row in zip(*unsorted_art_list)]
             art_lines.append("\n".join(art_list))
         art = "\n\n".join(art_lines)
@@ -71,7 +98,7 @@ class Ascii:
         return font
 
     @staticmethod
-    def verify_width(width):
+    def __verify_width(width):
         if width <= 0:
             try:
                 return os.get_terminal_size().columns

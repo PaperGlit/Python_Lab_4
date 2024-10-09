@@ -1,14 +1,14 @@
-import GlobalVariables as Global
 from BLL.classes.ascii import Ascii
 import DAL.functions.upload_to_file as file_upload
 
 
 class Console:
     def __init__(self):
+        self.ascii = Ascii("ASCIIFY", color="random")
         self.__prompt()
 
     def __prompt(self):
-        Ascii("ASCIIFY", color="random").print()
+        self.ascii.print()
         while True:
             prompt = input("1 - Enter text\n"
                            "2 - Change font's symbols\n"
@@ -27,10 +27,10 @@ class Console:
                 case _:
                     return
 
-    @staticmethod
-    def __enter_text():
+    def __enter_text(self):
         text = input("Enter text: ")
-        ftext = Ascii(text).print()
+        self.ascii.text = text
+        ftext = self.ascii.print()
         save_prompt = input("Do you want to save the text? (y/n): ").lower()
         if save_prompt == "y":
             while True:
@@ -47,38 +47,36 @@ class Console:
                 else:
                     print("Please enter a valid file name")
 
-    @staticmethod
-    def __change_symbols():
+    def __change_symbols(self):
         while True:
             shadow_prompt = input("Enter symbol for shadows: ")
             if shadow_prompt.strip() != "" or len(shadow_prompt) == 1:
-                Global.shadow = shadow_prompt
+                self.ascii.shadow = shadow_prompt
             else:
-                print("Please enter a valid shadow symbol (only one allowed)")
+                print("Please enter a valid shadows symbol (only one allowed)")
                 continue
             text_prompt = input("Enter symbol for text: ")
             if text_prompt.strip() != "" or len(text_prompt) == 1:
-                Global.text = text_prompt
+                self.ascii.text_s = text_prompt
             else:
                 print("Please enter a valid text symbol (only one allowed)")
                 continue
-            highlight_prompt = input("Enter symbol for highlight: ")
+            highlight_prompt = input("Enter symbol for highlights: ")
             if highlight_prompt.strip() != "" or len(highlight_prompt) == 1:
-                Global.highlight = highlight_prompt
+                self.ascii.highlight = highlight_prompt
             else:
-                print("Please enter a valid highlight symbol (only one allowed)")
+                print("Please enter a valid highlights symbol (only one allowed)")
                 continue
             break
 
-    @staticmethod
-    def __change_width_and_height():
+    def __change_width_and_height(self):
         while True:
             width_prompt = input("Enter the width of an ASCII art\n"
                       "(any non-positive value will reset it to default values\n"
                       "Your choice: ")
             try:
                 width = int(width_prompt)
-                Global.width = Ascii.verify_width(width)
+                self.ascii.width = width
                 print("Width changed successfully")
             except ValueError:
                 print("Please enter an integer")
@@ -88,15 +86,14 @@ class Console:
                                   "Your choice: ")
             try:
                 height = int(height_prompt)
-                Global.height = height
+                self.ascii.height = height
                 print("Height changed successfully")
                 break
             except ValueError:
                 print("Please enter an integer")
                 continue
 
-    @staticmethod
-    def __change_color():
+    def __change_color(self):
         color_prompt = input("Enter the color of your ASCII art:\n"
                              "1 - Red\n"
                              "2 - Green\n"
@@ -105,25 +102,28 @@ class Console:
                              "5 - Magenta\n"
                              "6 - Cyan\n"
                              "7 - Light gray\n"
+                             "8 - Random\n"
                              "0 - Default\n"
                              "Your choice: ")
         match color_prompt:
             case "1":
-                Global.color = "\033[31m"
+                self.ascii.color = "\033[31m"
             case "2":
-                Global.color = "\033[32m"
+                self.ascii.color = "\033[32m"
             case "3":
-                Global.color = "\033[33m"
+                self.ascii.color = "\033[33m"
             case "4":
-                Global.color = "\033[34m"
+                self.ascii.color = "\033[34m"
             case "5":
-                Global.color = "\033[35m"
+                self.ascii.color = "\033[35m"
             case "6":
-                Global.color = "\033[36m"
+                self.ascii.color = "\033[36m"
             case "7":
-                Global.color = "\033[37m"
+                self.ascii.color = "\033[37m"
+            case "8":
+                self.ascii.color = "random"
             case "0":
-                Global.color = "\033[39m"
+                self.ascii.color = "\033[39m"
             case _:
                 print("Invalid color choice, please try again.")
                 return
