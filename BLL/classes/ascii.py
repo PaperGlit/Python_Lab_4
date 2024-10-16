@@ -1,7 +1,7 @@
-import os
 import random
 import string
-from BLL.classes.incorrect_character_exception import IncorrectCharacterException
+from Shared.classes.validators import Validators
+from Shared.classes.incorrect_character_exception import IncorrectCharacterException
 
 
 class Ascii:
@@ -11,7 +11,7 @@ class Ascii:
         self.text_s = text_s
         self.highlight = highlight
         self.height = height
-        self.width = self.__verify_width(width)
+        self.width = Validators.verify_width(width)
         self.color = "\033[" + str(random.randint(31, 39)) + "m" if color == "random" else color
         self.color_reset = "\033[0m"
         self.justify = justify
@@ -52,7 +52,8 @@ class Ascii:
             unsorted_art_list = []
             for art_char in chunk:
                 font_art = self.font[art_char.upper()]
-                formatted_font_art = font_art.replace('*', self.highlight).replace('#', self.text_s).replace('&', self.shadow)
+                formatted_font_art = (font_art.replace('*', self.highlight)
+                                      .replace('#', self.text_s).replace('&', self.shadow))
                 split_font_art = formatted_font_art.splitlines()
                 unsorted_art_list.append(split_font_art)
             art_list = []
@@ -91,12 +92,3 @@ class Ascii:
                     key = keys[i]
                     font[key] = font.get(key, "") + line
         return font
-
-    @staticmethod
-    def __verify_width(width):
-        if width > 0:
-            return width
-        try:
-            return os.get_terminal_size().columns
-        except OSError:
-            return 220
